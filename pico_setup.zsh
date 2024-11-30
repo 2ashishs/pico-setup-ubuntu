@@ -18,8 +18,7 @@ DEPS="$SDK_DEPS $OPENOCD_DEPS $UART_DEPS"
 echo "Installing Dependencies"
 sudo apt update
 sudo apt upgrade -y
-sudo aptitude clean
-sudo apt install -y ${(z)DEPS} # zsh
+sudo apt install -y ${(z)DEPS}
 
 # Where will the output go?
 PICO_HOME="${HOME}/pico"
@@ -34,6 +33,7 @@ else
 	echo "Created $PICO_HOME."
 	echo "export PICO_HOME=$PICO_HOME" >> $PICO_RC
 	echo "source $PICO_RC" >> $ZSH_RC
+fi
 cd $PICO_HOME
 
 # Clone sw repos
@@ -58,7 +58,7 @@ do
         cd $PICO_HOME
 
         # Define PICO_SDK_PATH to $PICO_RC
-        VARNAME="PICO_${REPO:u}_PATH" # zsh
+        VARNAME="PICO_${REPO:u}_PATH"
         echo "Adding $VARNAME to $PICO_RC"
         echo "export $VARNAME=$DEST" >> $PICO_RC
         export ${VARNAME}=$DEST
@@ -133,7 +133,7 @@ else
     git clone "${GITHUB_PREFIX}openocd${GITHUB_SUFFIX}" --depth=1
     cd openocd
     ./bootstrap
-    ./configure ${(z)OPENOCD_CONFIGURE_ARGS} # zsh
+    ./configure ${(z)OPENOCD_CONFIGURE_ARGS}
     make -j$JNUM
     sudo make install
 fi
