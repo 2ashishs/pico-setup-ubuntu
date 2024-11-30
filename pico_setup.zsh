@@ -1,5 +1,4 @@
 #!/bin/zsh
-# !/bin/bash
 
 # Exit on error
 set -e
@@ -20,12 +19,12 @@ echo "Installing Dependencies"
 sudo apt update
 sudo apt upgrade -y
 sudo aptitude clean
-sudo apt install -y $DEPS # bash
+sudo apt install -y ${(z)DEPS} # zsh
 
 # Where will the output go?
 PICO_HOME="${HOME}/pico"
 PICO_RC="${HOME}/.pico_rc"
-BASH_RC="${HOME}/.bashrc"
+ZSH_RC="${HOME}/.zshrc"
 
 # Create pico directory to put everything in
 if [ -d $PICO_HOME ]; then
@@ -34,7 +33,7 @@ else
 	mkdir -p $PICO_HOME
 	echo "Created $PICO_HOME."
 	echo "export PICO_HOME=$PICO_HOME" >> $PICO_RC
-	echo "source $PICO_RC" >> $BASH_RC
+	echo "source $PICO_RC" >> $ZSH_RC
 cd $PICO_HOME
 
 # Clone sw repos
@@ -59,7 +58,7 @@ do
         cd $PICO_HOME
 
         # Define PICO_SDK_PATH to $PICO_RC
-        VARNAME="PICO_${REPO^^}_PATH" # bash
+        VARNAME="PICO_${REPO:u}_PATH" # zsh
         echo "Adding $VARNAME to $PICO_RC"
         echo "export $VARNAME=$DEST" >> $PICO_RC
         export ${VARNAME}=$DEST
@@ -134,7 +133,7 @@ else
     git clone "${GITHUB_PREFIX}openocd${GITHUB_SUFFIX}" --depth=1
     cd openocd
     ./bootstrap
-    ./configure $OPENOCD_CONFIGURE_ARGS # bash
+    ./configure ${(z)OPENOCD_CONFIGURE_ARGS} # zsh
     make -j$JNUM
     sudo make install
 fi
