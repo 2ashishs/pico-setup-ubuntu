@@ -43,14 +43,14 @@ SDK_BRANCH="master"
 
 for REPO in sdk examples extras playground
 do
-    DEST="$PICO_HOME/$REPO"
+    DEST="$PICO_HOME/pico-$REPO"
 
     if [ -d $DEST ]; then
         echo "$DEST already exists so skipping"
     else
         REPO_URL="${GITHUB_PREFIX}pico-${REPO}${GITHUB_SUFFIX}"
         echo "Cloning $REPO_URL"
-        git clone -b $SDK_BRANCH $REPO_URL $REPO
+        git clone -b $SDK_BRANCH $REPO_URL
 
         # Any submodules
         cd $DEST
@@ -70,28 +70,6 @@ cd $PICO_HOME
 # Pick up new variables we just defined
 source $PICO_RC
 
-# Build blink and i2c/slave_mem_i2c for pico and pico2
-cd $PICO_EXAMPLES_PATH
-for board in pico pico2
-do
-    build_dir=build_$board
-    mkdir $build_dir
-    cd $build_dir
-    
-    cmake ../ -DPICO_BOARD=$board -DCMAKE_BUILD_TYPE=Debug
-    
-    for e in blink i2c/slave_mem_i2c
-    do
-        echo "Building $e for $board"
-        cd $e
-        make -j$JNUM
-        cd ..
-    done
-
-    cd ..
-done
-
-cd $PICO_HOME
 
 # Debugprobe and picotool
 for REPO in debugprobe picotool
@@ -111,10 +89,14 @@ do
     if [[ "$REPO" == "picotool" ]]; then
         echo "Installing picotool to /usr/local/bin/picotool"
         sudo cp picotool /usr/local/bin/
+        echo "export PICOTOOL_FETCH_FROM_GIT_PATH=$PICO_HOME/picotool" >> $PICO_RC
+        export PICOTOOL_FETCH_FROM_GIT_PATH=$PICO_HOME/picotool
+        sudo cp ../udev/99-picotool.rules /etc/udev/rules.d/
     fi
 
     cd $PICO_HOME
 done
+
 
 # Install OpenOCD
 if [ -d openocd ]; then
@@ -139,3 +121,23 @@ else
 fi
 
 cd $PICO_HOME
+
+
+# Build blink and uart/hello_uart for pico2
+cd $PICO_EXAMPLES_PATH
+build_dir=build_$board
+mkdir $build_dir
+cd $build_dir
+
+cmake ../ -DPICO_BOARD=pico2 -DPICO_PLATFORM=rp2350 -DPICO_STDIO_USB=1 -DCMAKE_BUILD_TYPE=Debug
+
+for e in blink hello_world
+do
+	echo "Building $e for $board"
+	cd $e
+	make -j$JNUM
+	cd ..
+done
+
+cd $PICO_HOME
+
