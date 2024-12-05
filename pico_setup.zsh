@@ -92,6 +92,7 @@ do
         echo "export PICOTOOL_FETCH_FROM_GIT_PATH=$PICO_HOME/picotool" >> $PICO_RC
         export PICOTOOL_FETCH_FROM_GIT_PATH=$PICO_HOME/picotool
         sudo cp ../udev/99-picotool.rules /etc/udev/rules.d/
+	sudo udevadm control --reload-rules && sudo udevadm trigger
     fi
 
     cd $PICO_HOME
@@ -118,15 +119,22 @@ else
     ./configure ${(z)OPENOCD_CONFIGURE_ARGS}
     make -j$JNUM
     sudo make install
+    sudo cp ./contrib/60-openocd.rules /etc/udev/rules.d/
+    sudo udevadm control --reload-rules && sudo udevadm trigger
 fi
 
 cd $PICO_HOME
 
+# FreeRTOS Kernel
+git clone https://github.com/raspberrypi/FreeRTOS-Kernel.git
+export FREERTOS_KERNEL_PATH=$PICO_HOME/FreeRTOS-Kernel
+echo "export FREERTOS_KERNEL_PATH=$PICO_HOME/FreeRTOS-Kernel" >> $PICO_RC
 
-# Build blink and uart/hello_uart for pico2
+# Build blink and hello_world for pico2
 cd $PICO_EXAMPLES_PATH
+board=pico2
 build_dir=build_$board
-mkdir $build_dir
+mkdir -p $build_dir
 cd $build_dir
 
 cmake ../ -DPICO_BOARD=pico2 -DPICO_PLATFORM=rp2350 -DPICO_STDIO_USB=1 -DCMAKE_BUILD_TYPE=Debug
