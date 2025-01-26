@@ -149,3 +149,14 @@ done
 
 cd $PICO_HOME
 
+# Pico project template path
+PICO_PROJECT_TEMPLATE_PATH=$PICO_HOME/picoX-project-template
+if [ -d $PICO_PROJECT_TEMPLATE_PATH ]; then
+	echo "$PICO_PROJECT_TEMPLATE_PATH already exists."
+else
+	git clone https://github.com/2ashishs/picoX-project-template.git
+	echo "export PICO_PROJECT_TEMPLATE_PATH=$PICO_PROJECT_TEMPLATE_PATH" >> $PICO_RC
+	alias picox=$PICO_PROJECT_TEMPLATE_PATH/picoX.sh
+	echo "alias picox=$PICO_PROJECT_TEMPLATE_PATH/picoX.sh" >> $PICO_RC
+	echo "All set to build Pico projects using alias picox !!"
+fi
