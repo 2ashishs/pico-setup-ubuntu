@@ -27,7 +27,7 @@ picox DiscoLights
 To build a project say `DiscoLights`:
 ```shell
 cd DiscoLights
-# Update your code
+# Update your code and then
 ./do
 ```
 This will build your project, creating the `build` directory, which will contain the executable `.uf2` file.
